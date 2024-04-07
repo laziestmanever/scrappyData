@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizations</title>
+    <style>
+        .my-button {
+        background-color: #f0f0f0;
+        border: none;
+        color: #333;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        }
+        .my-button:hover {
+        background-color: #e0e0e0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 20px;
+        }
+        .industry-type
+        {
+            background-color: #e4e4e4;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .organization {
+            border-bottom: 1px solid #e7e4e4;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+        tr:nth-child(even) {
+        background-color: #dddddd;
+        }
+        .logo img {
+            max-width: 300px;
+            height: 80px;
+        } 
+        img
+        {
+            background-color: black !important
+        }
+        h1, h2 {
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body style="padding: 100px;">
+<h5>Paste the JSON</h5>
+<textarea id="json-content" rows="4" cols="50" type="text" placeholder="json comes here"></textarea></body><br>
+<button style="margin: 20px;padding: 5px;" onclick="getJSONfile()">Convert to HTML</button>
+<div id="arrayContainer"></div>
+<div class="container" id="organizationsContainer"></div>
+<script>
+    var orgData;
+    fetch('./orgjson.json')
+    .then(response => {
+        // Check if the response is ok (status 200)
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        orgData = data;
+        console.log(orgData); // Log the data to the console
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation: ', error);
+    });
+    var jsonVal;
+    var allOrgdata = [];
+    var uniqueID = [];
+    //GEt the JSON file
+    function getJSONfile()
+    {
+        jsonVal = "";
+        jsonVal = orgData;  
+        if(document.getElementById("json-content").value != "")
+        {
+         jsonVal = JSON.parse(document.getElementById("json-content").value);   
+        }
+        for(let j=0;j<jsonVal.length;j++)
+        {
+           var HEADQUARTERSjson;
+           var socialDetail;
+           if(jsonVal[j].SOCIAL != null)
+           {
+             try
+             {
+                socialDetail = jsonVal[j].SOCIAL.replace(/""([^"]+)""/g, '"$1"').replace(/""/g, '","');
+             }
+             catch(e)
+             {
+                socialDetail = "";
+             }
+           }
+           else
+           {
+             socialDetail = "";
+           }
+           //console.log(jsonVal[j].SOCIAL.replace(/""([^"]+)""/g, '"$1"').replace(/""/g, '","'));
+           if(jsonVal[j].HEADQUARTERS != null)
+           {
+            try
+             {
+                HEADQUARTERSjson = JSON.parse(jsonVal[j].HEADQUARTERS.replace(/""([^"]+)""/g, '"$1"').replace(/""/g, '","').replace("}{","},{"));
+             }
+             catch(e)
+             {
+                HEADQUARTERSjson = [{
+                    "CITY":"NA",
+                    "COUNTRY":"NA",
+                    "ID":"NA",
+                    "STATE":"NA"
+                }];
+             }
+           }
+           else
+           {
+             HEADQUARTERSjson = [{
+                    "CITY":"NA",
+                    "COUNTRY":"NA",
+                    "ID":"NA",
+                    "STATE":"NA"
+                }];
+           }
+            uniqueID.push({
+            "ORG_NAME": jsonVal[j].ORG_NAME,
+            "S_ID": jsonVal[j].S_ID
+            });
+            var metaDetail;
+            var correctedType;
+            if(jsonVal[j].DESCRIPTION != null)
+            {
+                metaDetail = jsonVal[j].DESCRIPTION.replace(/""([^"]+)""/g, '"$1"').replace(/""/g, '","'); 
+            }
+            else
+            {
+                metaDetail = "NA"
+            }
+            if(jsonVal[j].INDUSTRIES != null)
+            {
+                 correctedType = jsonVal[j].INDUSTRIES.replace(/""([^"]+)""/g, '"$1"');
+            }
+            else
+            {
+                correctedType:"Not Available";
+            }
+           var orgMap =  {
+                "S_ID":jsonVal[j].S_ID,
+                "ORG_NAME": jsonVal[j].ORG_NAME,
+                "ALIAS_ORG_NAME": jsonVal[j].ALIAS_ORG_NAME,
+                "WEBSITE": jsonVal[j].WEBSITE,
+                "CONTACT": jsonVal[j].CONTACT,
+                "EMAIL":jsonVal[j].EMAIL,
+                "TERRITORY": jsonVal[j].TERRITORY,
+                "LOGO": jsonVal[j].LOGO,
+                "DESCRIPTION":metaDetail,
+                "INDUSTRIES": correctedType,
+                "YEARS_IN_INDUSTRY":jsonVal[j].YEARS_IN_INDUSTRY,
+                "FOUNDING_YEAR":jsonVal[j].FOUNDING_YEAR,
+                "NO_OF_EMPLOYEES":jsonVal[j].NO_OF_EMPLOYEES,
+                "REVENUE":jsonVal[j].REVENUE,
+                "WEBSITE_STATUS":jsonVal[j].WEBSITE_STATUS,
+                "ORGSTATUS":jsonVal[j].ORGSTATUS,
+                // "ADDRESS":CorrectedJson,
+                "SOCIAL": socialDetail,
+                "HEADQUARTERS":HEADQUARTERSjson,
+                "BUSINESS_MODEL":jsonVal[j].BUSINESS_MODEL,
+                "STATUS":jsonVal[j].STATUS,
+           }
+           allOrgdata.push(orgMap);
+        }
+        console.log(allOrgdata);
+        const htmlContent = uniqueID.map(item => `<button class="my-button" ><a href="#${item.S_ID}"/>${item.ORG_NAME}</button>`).join('');
+        document.getElementById('arrayContainer').innerHTML = htmlContent;
+        displayOrganizations();
+    }
+    // Example array of JSON objects
+    const newData = allOrgdata;
+    function generateOrganizationHTML(organization) {
+        return `
+            <div id=${organization.S_ID} class="organization">
+                <div  class="logo">
+                    <img src="${organization.LOGO}" alt="${organization.ORG_NAME} Logo">
+                </div>
+                <h1>${organization.ORG_NAME}</h1>
+                <div>
+                 <h3>Meta Detail</h3>  
+                 <p>${organization.DESCRIPTION}</p>
+                </div>
+                <div>
+                    <h3>Contact Information</h3>
+                    <p>Email: <a href="mailto:${organization.EMAIL}">${organization.EMAIL}</a></p>
+                    <p>Website: <a href="${organization.WEBSITE}" target="_blank">${organization.WEBSITE}</a></p>
+                    <p>TERRITORY:${organization.TERRITORY}</p>
+                </div>
+                <div>
+                    <h3>Organization Details</h3>
+                    <table>
+                    <tr>
+                    <th>Website Status</th>    
+                    <th>Founding Year</th>
+                    <th>Years in Industry</th>
+                    <th>Revenue</th>
+                    <th>NO_OF_EMPLOYEES</th>
+                    <th>BUSINESS_MODEL</th>
+                    <th>ORGSTATUS</th>
+                    <th>ORGTYPE</th>
+                    </tr>                    
+                    <tr>
+                        <td>${organization.WEBSITE_STATUS}</td>    
+                        <td>${organization.FOUNDING_YEAR}</td>
+                        <td> ${organization.YEARS_IN_INDUSTRY}</td>
+                        <td>${organization.REVENUE}</td>
+                        <td>${organization.NO_OF_EMPLOYEES}</td>
+                        <td>${organization.BUSINESS_MODEL}</td>
+                        <td>${organization.ORGSTATUS}</td>
+                        <td>${organization.ORGTYPE}</td>
+                    </tr>
+                    </table>  
+                    <div>
+                     <h3>Industry Type</h3>   
+                     <p class="industry-type" >${organization.INDUSTRIES}</p>
+                    </div>
+                </div>
+                <div>
+                    <h3>Addresses</h3>
+                        ${organization.HEADQUARTERS.map(address => `
+                            <ol>
+                            <li><b>City :</b> ${address.CITY}</li>
+                            <li><b>State :</b> ${address.STATE}</li>
+                            <li><b>ID :</b> ${address.ID}</li>
+                            <li><b>Country :</b> ${address.COUNTRY}</li></ol>`)}
+                </div>
+                <div>
+                    <h3>Social Media Links</h3>
+                    <p>${organization.SOCIAL}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function displayOrganizations() {
+        const container = document.getElementById('organizationsContainer');
+        newData.forEach(organization => {
+            container.innerHTML += generateOrganizationHTML(organization);
+        });
+    }
+    // Call the function to display the organizations on page load
+    //window.onload = displayOrganizations;
+</script>
+
+</body>
+</html>
