@@ -5,6 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Organizations</title>
     <style>
+          .tecstack
+        {
+          max-height: 400px;
+          overflow:scroll ;
+          padding: 5px;
+          border: solid rgb(176, 168, 168) 2px;
+        }
+          body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    .category-title {
+        padding-top: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+    }
+    .item {
+        padding-left: 20px;
+    }
        img 
        {
         color: white;
@@ -134,22 +167,23 @@
         }
         for(let j=0;j<jsonVal.length;j++)
         {
-          //Techstack
-          var techStack;
+          //techstack
+          var techstack;
           if(jsonVal[j].techstack != "NULL" && jsonVal[j].techstack != "")
           {
             try
             {
-              techStack = JSON.parse(jsonVal[j].techstack);
+              techstack = JSON.parse(jsonVal[j].techstack);
+              //console.log(techstack);
             }
             catch(e)
             {
-              techStack = ["NA"]
+              techstack = {"NA":"NA"};
             }
           }
           else
           {
-            techStack = ["NA"]
+            techstack = {"NA":"NA"};
           }
            var HEADQUARTERSjson;
            var socialDetail;
@@ -261,7 +295,7 @@
                 "HEADQUARTERS":HEADQUARTERSjson,
                 "BUSINESS_MODEL":jsonVal[j].BUSINESS_MODEL,
                 "STATUS":jsonVal[j].STATUS,
-                "techstack":techStack
+                "techstack":techstack
            }
            allOrgdata.push(orgMap);
         }
@@ -330,13 +364,16 @@
                             <li><b>Country :</b> ${address.COUNTRY}</li></ol>`)}
                 </div>
         `;
+        jsonHtmlContent += '<h3>Techstack Details</h3> <div class="tecstack"> '; 
+        jsonHtmlContent += buildHtml(organization.techstack);
+        jsonHtmlContent += '</div>';
         jsonHtmlContent += generateLinksHTML(organization.SOCIAL);
         //jsonHtmlContent += '</div>';
         console.log(jsonHtmlContent);
         return jsonHtmlContent;
     }
+    // Social Data Genertaion
     function generateLinksHTML(socialData) {
-      console.log(socialData);
             var linksHTML = '<div><h3>Social Media Links</h3> <ol>';
             for (var key in socialData) {
                 if (socialData.hasOwnProperty(key)) {
@@ -349,6 +386,27 @@
             linksHTML += '</ol></div></div>';
             return linksHTML;
         }
+      // techstack data generation
+      function buildHtml(obj){
+      let htmlContent = '<table>';
+      for (let key in obj){
+          if (obj.hasOwnProperty(key)){
+              htmlContent += `<tr><th colspan="2" class="category-title">${key}</th></tr>`;
+              const value = obj[key];
+              if(typeof value === 'object' && !Array.isArray(value)) {
+                  htmlContent += buildHtml(value);
+              }else {
+                  value.forEach(item => {
+                      htmlContent += `<tr><td class="item">${item}</td></tr>`;
+                  });
+              }
+          }
+      }
+      console.log(htmlContent);
+      htmlContent += '</table>';
+      return htmlContent;
+    }
+    // techstack ends here
     function displayOrganizations() {
         const container = document.getElementById('organizationsContainer');
         newData.forEach(organization => {
@@ -356,7 +414,7 @@
         });
     }
     // Call the function to display the organizations on page load
-    //window.onload = displayOrganizations;
+    //window.onload = getJSONfile;
     
 </script>
 
