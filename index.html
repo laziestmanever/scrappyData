@@ -126,15 +126,66 @@
             padding: 10px;
             margin-top: 30px;
         }
+        textarea {
+      resize: none;
+      }
+      /* CSS */
+      .con {
+          align-self: center;
+          background-color: #fff;
+          background-image: none;
+          background-position: 0 90%;
+          background-repeat: repeat no-repeat;
+          background-size: 4px 3px;
+          border-radius: 15px 225px 255px 15px 15px 255px 225px 15px;
+          border-style: solid;
+          border-width: 2px;
+          box-shadow: rgba(0, 0, 0, .2) 15px 28px 25px -18px;
+          box-sizing: border-box;
+          color: #41403e;
+          cursor: pointer;
+          display: inline-block;
+          font-family: Neucha, sans-serif;
+          font-size: 1rem;
+          line-height: 23px;
+          outline: none;
+          padding: .75rem;
+          text-decoration: none;
+          transition: all 235ms ease-in-out;
+          border-bottom-left-radius: 15px 255px;
+          border-bottom-right-radius: 225px 15px;
+          border-top-left-radius: 255px 15px;
+          border-top-right-radius: 15px 225px;
+          user-select: none;
+          -webkit-user-select: none;
+          touch-action: manipulation;
+      }
+        .con:hover {
+          box-shadow: rgba(0, 0, 0, .3) 2px 8px 8px -5px;
+          transform: translate3d(0, 2px, 0);
+        }
+        .con:focus {
+          box-shadow: rgba(0, 0, 0, .3) 2px 8px 4px -6px;
+        }
     </style>
 </head>
 <body style="padding: 100px;">
-<h5>Paste the JSON</h5>
-<textarea id="json-content" rows="4" cols="50" type="text" placeholder="json comes here"></textarea></body><br>
-<button style="margin: 20px;padding: 5px;" onclick="getJSONfile()">Convert to HTML</button>
-<div id="arrayContainer"></div>
+<div style="display: flex;flex-direction: row;justify-content: space-evenly;margin-bottom: 40px;" >
+  <div>
+    <h5>JSON to HTML Parser</h5>
+    <textarea id="json-content" rows="15" cols="50" type="text" placeholder="paste the json  here"></textarea>
+  </div>
+  <div style="margin-top: 80px;" >
+    <button class="con" style="margin: 20px;padding: 5px;" onclick="getJSONfile(0)">Convert to HTML</button> <br>
+    <button class="con" style="margin: 20px;padding: 5px;" onclick="getJSONfile(1)">View Existing Records</button>
+  </div>
+</div>
+<center>
+  <div style="margin-bottom: 40px;" id="arrayContainer"></div>
+</center>
 <div class="container" id="organizationsContainer">
 </div>
+</body>
 <script>
     var orgData;
     fetch('./orgjson.json')
@@ -157,13 +208,30 @@
     var allOrgdata = [];
     var uniqueID = [];
     //GEt the JSON file
-    function getJSONfile()
+    function getJSONfile(type)
     {
         jsonVal = "";
-        jsonVal = orgData;  
-        if(document.getElementById("json-content").value != "")
+        if(type == 1)
         {
-         jsonVal = JSON.parse(document.getElementById("json-content").value);   
+          jsonVal = orgData;  
+        }
+        else
+        {
+            if(document.getElementById("json-content").value != "")
+            {
+              try
+              {
+                jsonVal = JSON.parse(document.getElementById("json-content").value);  
+              }
+              catch(e)
+              {
+                alert(e+" Please provide a valid JSON");
+              } 
+            }
+            else
+            {
+              alert("Please provide a valid JSON");
+            }
         }
         for(let j=0;j<jsonVal.length;j++)
         {
@@ -311,7 +379,7 @@
       var jsonHtmlContent = `
             <div id=${organization.S_ID} class="organization">
                 <div  class="logo">
-                    <img src="${organization.LOGO}" alt="${organization.ORG_NAME} Logo">
+                    <center><img src="${organization.LOGO}" alt="${organization.ORG_NAME} Logo"></center>
                 </div>
                 <h1>${organization.ORG_NAME}</h1>
                 <div>
